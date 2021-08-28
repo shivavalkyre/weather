@@ -1,0 +1,121 @@
+﻿Build1=Default,b4a.example
+Build2=Weather,com.weather
+File1=background.png
+File2=cloud.png
+File3=front_logo.png
+File4=Layout.bal
+File5=layoutWeather.bal
+File6=scattered.png
+File7=sun.png
+File8=weather.db
+FileGroup1=Default Group
+FileGroup2=Default Group
+FileGroup3=Default Group
+FileGroup4=Default Group
+FileGroup5=Default Group
+FileGroup6=Default Group
+FileGroup7=Default Group
+FileGroup8=Default Group
+Group=Default Group
+Library1=appcompat
+Library10=json
+Library2=core
+Library3=dateutils
+Library4=fusedlocationprovider
+Library5=geocoder
+Library6=gps
+Library7=okhttputils2
+Library8=runtimepermissions
+Library9=sql
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="29"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~SetApplicationAttribute(android:theme, "@style/MyAppTheme")~\n~'CreateResourceFromFile(Macro, Themes.LightTheme)~\n~CreateResource(values, theme.xml,~\n~<resources>~\n~    <style name="MyAppTheme" parent="Theme.AppCompat.Light.NoActionBar">~\n~        <item name="colorPrimary">#2868E1</item>~\n~        <item name="colorPrimaryDark">#2868E1</item>~\n~        <item name="colorAccent">#FFFFFF</item>~\n~        <item name="windowNoTitle">true</item>~\n~        <item name="windowActionBar">false</item>~\n~    </style>~\n~</resources>~\n~)~\n~~\n~AddPermission(android.permission.ACCESS_FINE_LOCATION)~\n~AddPermission(android.permission.ACCESS_COARSE_LOCATION)~\n~~\n~AddManifestText(~\n~<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>~\n~<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>~\n~<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>~\n~<uses-permission android:name="android.permission.CAMERA"></uses-permission>~\n~<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />~\n~<uses-permission android:name="android.permission.RECORD_AUDIO" />~\n~<uses-permission android:name="android.permission.INTERNET" />~\n~<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>~\n~<uses-feature android:name="android.hardware.camera" />~\n~<uses-feature android:name="android.hardware.camera.autofocus" />~\n~<uses-feature android:name="android.hardware.camera.front" />~\n~<uses-feature android:name="android.hardware.audio.low_latency" />~\n~<uses-feature android:name="android.hardware.audio.pro" />~\n~<uses-feature android:name="android.hardware.microphone" android:required="true"/>~\n~<uses-permission android:name="android.permission.RECORD_AUDIO" />~\n~)~\n~AddApplicationText(<meta-data~\n~    android:name="com.google.android.gms.version"~\n~    android:value="@integer/google_play_services_version" />)~\n~'End of default text.~\n~
+Module1=general
+Module2=Starter
+Module3=Weather
+NumberOfFiles=8
+NumberOfLibraries=10
+NumberOfModules=3
+Version=11
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: Weather
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: True
+	#IncludeTitle: False
+#End Region
+#BridgeLogger:true
+#AdditionalJar: com.android.support:support-v4
+#AdditionalJar: com.google.android.gms:play-services-location
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+	Private Timer1 As Timer
+	Private SQL1 As SQL
+	Private rp As RuntimePermissions
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	Private ImageView2 As ImageView
+	Private ImageView3 As ImageView
+	Private ImageView4 As ImageView
+	Private ImageView5 As ImageView
+	Private ImageView6 As ImageView
+	Private ImageView8 As ImageView
+	Private Label22 As Label
+	Private Label24 As Label
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	
+	For Each permission As String In Array(rp.PERMISSION_ACCESS_COARSE_LOCATION,rp.PERMISSION_ACCESS_FINE_LOCATION,rp.PERMISSION_READ_EXTERNAL_STORAGE,rp.PERMISSION_WRITE_EXTERNAL_STORAGE)
+		rp.CheckAndRequest(permission)
+		Wait For Activity_PermissionResult (permission As String, Result As Boolean)
+		If Result = False Then
+			ToastMessageShow("No permission!", True)
+			Activity.Finish
+			Return
+		End If
+	Next
+	Starter.StartFLP
+	If FirstTime Then
+		If File.Exists(File.DirDefaultExternal, "weather.db") = False Then
+			File.Copy(File.DirAssets, "weather.db", File.DirDefaultExternal,"weather.db")
+			SQL1.Initialize(File.DirDefaultExternal, "weather.db", True)
+		End If
+		File.MakeDir(File.DirDefaultExternal,"weather")
+	Else
+		If File.Exists(File.DirDefaultExternal, "weather.db") = False Then
+			File.Copy(File.DirAssets, "weather.db", File.DirDefaultExternal,"weather.db")
+			SQL1.Initialize(File.DirDefaultExternal, "weather.db", True)
+		Else
+			SQL1.Initialize(File.DirDefaultExternal, "weather.db", True)
+		End If
+	End If
+	
+	Activity.LoadLayout("Layout")
+	Timer1.Initialize("Timer1",1000)
+	Timer1.Enabled=True
+	
+	
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+Sub Timer1_tick
+	Timer1.Enabled=False
+	StartActivity(Weather)
+	Activity.Finish
+End Sub
